@@ -9,7 +9,7 @@
     <!-- Se importan Tailwind y JS del autenticador de Breeze -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link rel="stylesheet" href="{{ asset('public/css/estilo.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/estilo.css') }}?v={{ time() }}">
 
 </head>
 <body class="bg-gray-100">
