@@ -17,5 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-!storage/app/public/
-!storage/app/public/prendas/
+!/storage/app/
+!/storage/app/public/
+!/storage/app/public/prendas/
