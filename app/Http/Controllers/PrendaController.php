@@ -68,61 +68,71 @@ class PrendaController extends Controller
     public function subirPrenda (Request $request) {
 
         // VALIDACIÓN DE DATOS
-        $datos = $request -> validate (
+        $datos = $request->validate(
             [
-                'titulo' => 'required|string|min:4|max:50',
-                'descripcion' => 'required|string|max:250',
+                // Permite letras, números, espacios, puntos, comas, guiones y barras. Prohíbe símbolos raros (@, #, €, etc)
+                'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                'descripcion' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                
                 'tipo' => 'required|in:Camiseta,Calzonas,Pantalón,Sudadera,Chándal,Bufanda,Otro',
-                'deporte' => 'required|string|min:4|max:50',
+                
+                // Estrictos: Solo letras, espacios y guiones (sin números)
+                'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
                 'talla' => 'required|in:XS,S,M,L,XL,XXL,Única',
-                'equipo' => 'required|string|min:4|max:50',
-                'color' => 'required|string|min:4|max:50',
-                'anio' => 'nullable|integer|min:1900|max:' . date('Y'), // Opcional, número, entre 1900 y este año
-                'etiquetas' => 'nullable|string|max:255',               // Opcional, texto
+                'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                
+                'anio' => 'nullable|integer|min:1900|max:' . date('Y'),
+                'etiquetas' => 'nullable|string|max:255',
                 'estado' => 'required|in:Nuevo,Seminuevo,Usado',
-                'imagen' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048' // <-- Validación de la imagen (máx 2MB)
+                'imagen' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048'
             ],
             [
-                    // MENSAJES PERSONALIZADOS
-                    'titulo.required' => 'El título de la prenda es obligatorio.',
-                    'titulo.min' => 'El título es demasiado corto (mínimo 4 caracteres).',
-                    'titulo.max' => 'El título es demasiado largo (máximo 50 caracteres).',
-                    
-                    'descripcion.required' => 'Debes añadir una descripción a la prenda.',
-                    'descripcion.max' => 'La descripción no puede superar los 250 caracteres.',
-                    
-                    'tipo.required' => 'Por favor, selecciona un tipo de prenda.',
-                    'tipo.in' => 'El tipo de prenda seleccionado no es válido.',
-                    
-                    'deporte.required' => 'Es obligatorio indicar un deporte.',
-                    'deporte.min' => 'El deporte es demasiado corto (mínimo 4 caracteres).',
-                    'deporte.max' => 'El deporte es demasiado largo (máximo 50 caracteres).',
-                    
-                    'talla.required' => 'Por favor, selecciona un tipo de prenda.',
-                    'talla.in' => 'La talla seleccionada no es válida.',
-                    
-                    'equipo.required' => 'Es obligatorio indicar un equipo.',
-                    'equipo.min' => 'El equipo es demasiado corto (mínimo 4 caracteres).',
-                    'equipo.max' => 'El equipo es demasiado largo (máximo 50 caracteres).',
-                    
-                    'color.required' => 'Es obligatorio indicar un color.',
-                    'color.min' => 'El color es demasiado corto (mínimo 4 caracteres)..',
-                    'color.max' => 'El color es demasiado largo (máximo 50 caracteres).',
-                    
-                    'anio.integer' => 'El año debe ser un número entero.',
-                    'anio.min' => 'El año mínimo permitido es 1900.',
-                    'anio.max' => 'El año no puede ser superior al actual.',
-                    
-                    'etiquetas.max' => 'Has escrito demasiadas etiquetas (máximo 255 caracteres).',
-                    
-                    'estado.required' => 'Por favor, selecciona un estado.',
-                    'estado.in' => 'El estado seleccionado no es válido.',
-                    
-                    'imagen.required' => 'Es obligatorio subir una imagen de la prenda.',
-                    'imagen.image' => 'El archivo debe ser una imagen real.',
-                    'imagen.mimes' => 'Formatos permitidos: jpeg, png, jpg o webp.',
-                    'imagen.max' => 'La imagen pesa demasiado (límite: 2MB).'
-                ]
+                // MENSAJES PERSONALIZADOS
+                'titulo.required' => 'El título de la prenda es obligatorio.',
+                'titulo.min' => 'El título es demasiado corto.',
+                'titulo.max' => 'El título es demasiado largo.',
+                'titulo.regex' => 'El título contiene símbolos no permitidos. Usa solo letras, números o puntuación básica.', // <-- NUEVO
+                
+                'descripcion.required' => 'Debes añadir una descripción a la prenda.',
+                'descripcion.max' => 'La descripción no puede superar los 250 caracteres.',
+                'descripcion.regex' => 'La descripción contiene símbolos no permitidos.', // <-- NUEVO
+                
+                'tipo.required' => 'Por favor, selecciona un tipo de prenda.',
+                'tipo.in' => 'El tipo de prenda seleccionado no es válido.',
+                
+                'deporte.required' => 'Es obligatorio indicar un deporte.',
+                'deporte.min' => 'El deporte es demasiado corto.',
+                'deporte.max' => 'El deporte es demasiado largo.',
+                'deporte.regex' => 'El deporte solo puede contener letras, espacios y guiones.', 
+                
+                'talla.required' => 'Por favor, selecciona una talla.',
+                'talla.in' => 'La talla seleccionada no es válida.',
+                
+                'equipo.required' => 'Es obligatorio indicar un equipo.',
+                'equipo.min' => 'El equipo es demasiado corto.',
+                'equipo.max' => 'El equipo es demasiado largo.',
+                'equipo.regex' => 'El equipo solo puede contener letras, espacios y guiones.', 
+                
+                'color.required' => 'Es obligatorio indicar un color.',
+                'color.min' => 'El color es demasiado corto.',
+                'color.max' => 'El color es demasiado largo.',
+                'color.regex' => 'El color solo puede contener letras, espacios y guiones.', 
+                
+                'anio.integer' => 'El año debe ser un número.',
+                'anio.min' => 'El año mínimo es 1900.',
+                'anio.max' => 'El año no puede ser del futuro.',
+                
+                'etiquetas.max' => 'Demasiadas etiquetas (máximo 255 caracteres).',
+                
+                'estado.required' => 'Por favor, selecciona un estado.',
+                'estado.in' => 'El estado seleccionado no es válido.',
+                
+                'imagen.required' => 'Es obligatorio subir una imagen de la prenda.',
+                'imagen.image' => 'El archivo debe ser una imagen real.',
+                'imagen.mimes' => 'Formatos permitidos: jpeg, png, jpg o webp.',
+                'imagen.max' => 'La imagen pesa demasiado (límite: 2MB).'
+            ]
         );
 
         // MODIFICACIÓN DEL MODELO --> Eloquent
@@ -172,10 +182,10 @@ class PrendaController extends Controller
         // Si el usuario es el dueño de la prenda o es administrador, puede eliminarla
         if ($prenda->user_id === auth()->id() || $request->user()->esAdmin()) {
 
-            foreach ($prenda->imagenes as $imagen) {
-                // Le quitamos el 'storage/' inicial para que Laravel encuentre el archivo original
-                $rutaImagen = str_replace('storage/', '', $imagen->url);
+            if ($prenda->imagenes) {
+                $rutaImagen = str_replace('storage/', '', $prenda->imagenes->url);
                 Storage::disk('public')->delete($rutaImagen);
+                $prenda->imagenes()->delete();
             }
 
             $prenda->imagenes()->delete(); // Se elimina la imagen
@@ -216,13 +226,18 @@ class PrendaController extends Controller
             // VALIDACIÓN DE DATOS
             $datos = $request->validate(
                 [
-                    'titulo' => 'required|string|min:4|max:50',
-                    'descripcion' => 'required|string|max:250',
+                    // Permite letras, números, espacios, puntos, comas, guiones y barras. Prohíbe símbolos raros (@, #, €, etc)
+                    'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                    'descripcion' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                    
                     'tipo' => 'required|in:Camiseta,Calzonas,Pantalón,Sudadera,Chándal,Bufanda,Otro',
-                    'deporte' => 'required|string|min:4|max:50',
+                    
+                    // Estrictos: Solo letras, espacios y guiones (sin números)
+                    'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
                     'talla' => 'required|in:XS,S,M,L,XL,XXL,Única',
-                    'equipo' => 'required|string|min:4|max:50',
-                    'color' => 'required|string|min:4|max:50',
+                    'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                    'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                    
                     'anio' => 'nullable|integer|min:1900|max:' . date('Y'),
                     'etiquetas' => 'nullable|string|max:255',
                     'estado' => 'required|in:Nuevo,Seminuevo,Usado',
@@ -233,9 +248,11 @@ class PrendaController extends Controller
                     'titulo.required' => 'El título de la prenda es obligatorio.',
                     'titulo.min' => 'El título es demasiado corto (mínimo 4 caracteres).',
                     'titulo.max' => 'El título es demasiado largo (máximo 50 caracteres).',
+                    'titulo.regex' => 'El título contiene símbolos no permitidos. Usa solo letras, números o puntuación básica.', 
                     
                     'descripcion.required' => 'Debes añadir una descripción a la prenda.',
                     'descripcion.max' => 'La descripción no puede superar los 250 caracteres.',
+                    'descripcion.regex' => 'La descripción contiene símbolos no permitidos.',
                     
                     'tipo.required' => 'Por favor, selecciona un tipo de prenda.',
                     'tipo.in' => 'El tipo de prenda seleccionado no es válido.',
@@ -243,17 +260,20 @@ class PrendaController extends Controller
                     'deporte.required' => 'Es obligatorio indicar un deporte.',
                     'deporte.min' => 'El deporte es demasiado corto (mínimo 4 caracteres).',
                     'deporte.max' => 'El deporte es demasiado largo (máximo 50 caracteres).',
+                    'deporte.regex' => 'El deporte solo puede contener letras, espacios y guiones.', 
                     
-                    'talla.required' => 'Por favor, selecciona un tipo de prenda.',
+                    'talla.required' => 'Por favor, selecciona una talla.',
                     'talla.in' => 'La talla seleccionada no es válida.',
                     
                     'equipo.required' => 'Es obligatorio indicar un equipo.',
                     'equipo.min' => 'El equipo es demasiado corto (mínimo 4 caracteres).',
                     'equipo.max' => 'El equipo es demasiado largo (máximo 50 caracteres).',
+                    'equipo.regex' => 'El equipo solo puede contener letras, espacios y guiones.', 
                     
                     'color.required' => 'Es obligatorio indicar un color.',
-                    'color.min' => 'El color es demasiado corto (mínimo 4 caracteres)..',
+                    'color.min' => 'El color es demasiado corto (mínimo 4 caracteres).',
                     'color.max' => 'El color es demasiado largo (máximo 50 caracteres).',
+                    'color.regex' => 'El color solo puede contener letras, espacios y guiones.', 
                     
                     'anio.integer' => 'El año debe ser un número entero.',
                     'anio.min' => 'El año mínimo permitido es 1900.',
@@ -301,8 +321,9 @@ class PrendaController extends Controller
                 if ($request->hasFile('imagen')) {
                     
                     // 1) Se borra la imagen física antigua del disco duro
-                    foreach ($prenda->imagenes as $imagenAntigua) {
-                        $rutaImagen = str_replace('storage/', '', $imagenAntigua->url);
+                    if ($prenda->imagenes) {
+                        // Accedemos directamente a la propiedad 'url' del objeto único
+                        $rutaImagen = str_replace('storage/', '', $prenda->imagenes->url);
                         Storage::disk('public')->delete($rutaImagen);
                     }
 

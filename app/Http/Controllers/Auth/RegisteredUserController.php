@@ -31,9 +31,34 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+            'email' => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'email', 
+                'max:255', 
+                'unique:'.User::class, 
+                'regex:/^[\w\.\-]+@[\w\.\-]+\.[a-zA-Z]{2,}$/'
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            // MENSAJES PERSONALIZADOS
+            'name.required' => 'El nombre es obligatorio.',
+            'name.regex' => 'El nombre contiene símbolos no permitidos. Usa solo letras.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo debe ser válido.',
+            'email.unique' => 'Este correo ya está registrado en Aventa.',
+            'email.regex' => 'El correo electrónico debe tener una extensión válida (ej: @gmail.com).',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+        ]);
+
+        // 2. LA CREACIÓN DEL USUARIO (Esto lo dejas tal cual lo tenías)
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         $user = User::create([
