@@ -88,34 +88,38 @@ Route::patch('/usuarios/{usuario}/toggle-activo', [ProfileController::class, 'to
 
 // Ruta para MOSTRAR la vista de mantenimiento (Solo Admin)
 Route::get('/admin/mantenimiento', function (Request $request) {
+    
     $usuario = $request->user();
+    $resultado = null;
 
     if ($usuario && $usuario->esAdmin()) {
-        // Buscamos en TODO el disco local, sin importar la carpeta
-        $todosLosArchivos = Storage::disk('local')->allFiles(); 
-        
+        // Buscamos TODOS los archivos en storage/app de forma recursiva
+        $archivos = Storage::disk('local')->allFiles(); 
         $backups = [];
 
-        foreach ($todosLosArchivos as $archivo) {
-            // Solo nos interesan los archivos que terminen en .zip
+        foreach ($archivos as $archivo) {
+            // Filtramos solo los archivos .zip
             if (pathinfo($archivo, PATHINFO_EXTENSION) === 'zip') {
                 $backups[] = [
-                    // Guardamos el timestamp para ordenar y la fecha formateada para mostrar
                     'timestamp' => Storage::disk('local')->lastModified($archivo),
                     'fecha' => date('d/m/Y H:i:s', Storage::disk('local')->lastModified($archivo)),
                 ];
             }
         }
 
-        // Ordenamos por el timestamp (número puro) para que no falle nunca
+        // Ordenamos por fecha (el más reciente arriba)
         usort($backups, function($a, $b) {
             return $b['timestamp'] <=> $a['timestamp'];
         });
 
-        return view('privada.mantenimiento', ['backups' => $backups]);
+        $resultado = view('privada.mantenimiento', ['backups' => $backups]);
+    } else {
+        $resultado = redirect()->route('catalogo')->with('error', 'No tienes permisos para acceder a esta área.');
     }
-    
-    return redirect()->route('catalogo')->with('error', 'No tienes permisos.');
+
+    // ÚNICO RETURN DE LA FUNCIÓN
+    return $resultado;
+
 })->name('mantenimiento');
 
 
