@@ -61,7 +61,12 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
-            'dump' => ['dump_binary_path' => 'C:/xampp/mysql/bin/',]
+            'dump' => [
+                // Busca en el archivo .env. Si no lo encuentra, usa la ruta por defecto de Linux (/usr/bin/)
+                'dump_binary_path' => env('DUMP_BINARY_PATH', '/usr/bin/'), 
+                'use_single_transaction',
+                'timeout' => 60 * 5,
+            ],
         ],
 
         'pgsql' => [
