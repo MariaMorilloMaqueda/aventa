@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol',
+        'activo', // <--- Añadir aquí
     ];
 
     /**
@@ -42,9 +44,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'activo' => 'boolean',
     ];
 
-    const ROLES=['admin', 'usuario'];
+    const ROLES=['admin', 'empleado', 'usuario'];
 
     // Un usuario tiene muchas prendas
     public function prendas(): HasMany
@@ -74,5 +77,10 @@ class User extends Authenticatable
     public function esAdmin()
     {
         return $this->rol === 'admin';
+    }
+
+    public function esEmpleado()
+    {
+        return $this->rol === 'empleado';
     }
 }

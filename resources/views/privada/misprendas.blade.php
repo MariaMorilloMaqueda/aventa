@@ -1,6 +1,7 @@
 @extends('plantillas.baseprivada')
 
-@section('titulo', auth()->user()->esAdmin() ? strtoupper('Prendas Subidas') : strtoupper('Mis prendas'))
+{{-- CAMBIO: El título cambia si es admin o empleado --}}
+@section('titulo', (auth()->user()->esAdmin() || auth()->user()->esEmpleado()) ? strtoupper('Prendas de la plataforma') : strtoupper('Mis prendas'))
 
 @section('contenido')
 
@@ -20,9 +21,7 @@
 
         <section class="seccion-comun">
             <header class="cabecera-comun">
-                <h2>Hola {{ Auth::user()->name}}, esta son {{ $mensajePersonalizado }}.</h2>
-                
-                <p>Mis prendas</p>
+                <h2>Hola {{ Auth::user()->name}}, estas son {{ $mensajePersonalizado }}.</h2>
             </header>
         </section>
 
@@ -43,10 +42,10 @@
                             <th>Año</th>
                             <th>Estado</th>
                             <th>Disponible</th>
-                            @if (Auth::user()->esAdmin()) <!-- Esta columna solo aparece si es administrador -->
+                            @if (Auth::user()->esAdmin() || Auth::user()->esEmpleado()) 
                                 <th>Propietario</th>
                             @endif
-                            <th></th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,26 +67,30 @@
                                 <td>{{ $prenda->anio }}</td>
                                 <td>{{ $prenda->estado }}</td>
                                 <td>{{ $prenda->disponible == 1 ? 'Sí' : 'No' }}</td>
-                                @if (Auth::user()->esAdmin()) <!-- Este campo solo aparece si es administrador -->
+                                
+                                @if (Auth::user()->esAdmin() || Auth::user()->esEmpleado()) 
                                     <td>{{ $prenda->user->name }}</td>
                                 @endif
+                                
                                 <td>
                                     <div class="botones-misprendas">
                                         <form action="{{ route('formeditarprenda', ['prenda' => $prenda->id]) }}" method="get">
                                             <input class="boton" type="submit" value="Editar">
                                         </form>
-                                        <form action="{{route('borrarprenda',['prenda'=>$prenda->id])}}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta prenda?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <input class="boton" type="submit" value="Borrar">
-                                        </form>
+
+                                        @if (Auth::user()->esAdmin() || Auth::id() === $prenda->user_id)
+                                            <form action="{{route('borrarprenda',['prenda'=>$prenda->id])}}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta prenda?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <input class="boton boton-rojo" type="submit" value="Borrar">
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                <!-- Muestra solo 1 número a los lados de la página actual -->
                 <div>{{ $prendas->onEachSide(1)->links() }}</div>
             </div>
         @endif

@@ -12,44 +12,32 @@ class IntercambioController extends Controller {
     public function irAIntercambios(Request $request) {
 
         $usuario = $request->user();
-        $valoraciones = collect(); // Inicializamos vacía por si es admin
-        $titulo = "";
+        
+        // BLOQUEO DE SEGURIDAD: Solo usuarios estándar pueden acceder
+        if ($usuario->rol !== 'usuario') {
+            return redirect()->route('catalogo')->with('error', 'No tienes permisos para acceder a esta sección.');
+        }
 
-        // VALIDACIÓN DE USUARIOS Y DATOS
-        if ($usuario->esAdmin()) {
-            // ADMINISTRADOR: El administrador ve TODOS los intercambios de la plataforma
-            $intercambios = Intercambio::with([
-                'solicitante', 
-                'receptor', 
-                'prendaOfrecida.imagenes', 
-                'prendaSolicitada.imagenes'
-            ])->get();
+        // USUARIO NORMAL: ve sus propios intercambios
+        $userId = $usuario->id;
 
-            $titulo = "estos son todos los intercambios de la plataforma";
-            // No se cargan las valoraciones porque para el admin no son relevantes en esta vista
-        } 
-        else {
-            // USUARIO NORMAL: ve sus propios intercambios
-            $userId = $usuario->id;
+        $intercambios = Intercambio::with([
+            'solicitante', 
+            'receptor', 
+            'prendaOfrecida.imagenes', 
+            'prendaSolicitada.imagenes'
+        ])
+        ->where('solicitante_id', $userId)
+        ->orWhere('receptor_id', $userId)
+        ->get();
 
-            $intercambios = Intercambio::with([
-                'solicitante', 
-                'receptor', 
-                'prendaOfrecida.imagenes', 
-                'prendaSolicitada.imagenes'
-            ])
-            ->where('solicitante_id', $userId)
-            ->orWhere('receptor_id', $userId)
+        $idsIntercambios = $intercambios->pluck('id');
+
+        $valoraciones = Valoracion::with(['intercambio.solicitante', 'intercambio.receptor'])
+            ->whereIn('intercambio_id', $idsIntercambios)
             ->get();
 
-            $idsIntercambios = $intercambios->pluck('id');
-
-            $valoraciones = Valoracion::with(['intercambio.solicitante', 'intercambio.receptor'])
-                ->whereIn('intercambio_id', $idsIntercambios)
-                ->get();
-
-            $titulo = "este es tu historial de intercambios";
-        }
+        $titulo = "este es tu historial de intercambios";
 
         // GENERACIÓN DE LA VISTA
         return view('privada.intercambios', ['intercambios' => $intercambios,'valoraciones' => $valoraciones,'mensajePersonalizado' => $titulo]);
@@ -117,18 +105,18 @@ class IntercambioController extends Controller {
         // VALIDACIÓN DE USUARIO Y ESTADO
         $usuario = $request->user();
 
-        // Solo se puede aceptar si el estado esta el pendiente y es el usuario autenticado (receptor) o es administrador.
-        if (strtolower($intercambio->estado) !== 'pendiente' || (!$usuario->esAdmin() && $intercambio->receptor_id !== $usuario->id)) {
+        // Solo se puede aceptar si el estado esta en pendiente y es el usuario autenticado (receptor).
+        if (strtolower($intercambio->estado) !== 'pendiente' || $intercambio->receptor_id !== $usuario->id) {
 
             $resultado = redirect()->back()->with('error', 'No tienes permiso para aceptar este intercambio.');
 
         } else {
 
-        // MODIFICACIÓN DEL MODELO --> Eloquent (las prendas pasan al estado no disponible gracias al evento del modelo)
-        $intercambio->estado = 'completado';
-        $intercambio->save();
+            // MODIFICACIÓN DEL MODELO --> Eloquent (las prendas pasan al estado no disponible gracias al evento del modelo)
+            $intercambio->estado = 'completado';
+            $intercambio->save();
 
-         $resultado = redirect()->route('intercambios')->with('mensaje', '¡Has aceptado el intercambio! Las prendas ya no están disponibles en el catálogo.');
+            $resultado = redirect()->route('intercambios')->with('mensaje', '¡Has aceptado el intercambio! Las prendas ya no están disponibles en el catálogo.');
         }
 
         // DEVOLUNCIÓN DE LA VISTA
@@ -139,12 +127,11 @@ class IntercambioController extends Controller {
     public function cancelarIntercambio(Request $request, Intercambio $intercambio) {
 
         // VALIDACIÓN DE USUARIO Y ESTADO
-        $esAdministrador = $request->user()->esAdmin();
         $esParticipante = auth()->id() === $intercambio->solicitante_id || auth()->id() === $intercambio->receptor_id;
         $esCancelable = strtolower($intercambio->estado) === 'pendiente';
 
-        // Solo se puede cancelar si el estado esta en pendiente y el usuario es participante del intercambio o administrador
-        if (!$esCancelable || (!$esAdministrador && !$esParticipante)) {
+        // Solo se puede cancelar si el estado esta en pendiente y el usuario es participante del intercambio
+        if (!$esCancelable || !$esParticipante) {
 
             $resultado = redirect()->back()->with('error', 'No tienes permiso para cancelar este intercambio.');
 

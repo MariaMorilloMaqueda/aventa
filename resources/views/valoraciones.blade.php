@@ -23,7 +23,7 @@
     </section>
 
     @if ($valoraciones->where('evaluador_id', '!=', $user->id)->isEmpty())
-        <p>Este usuario no ha recibido ni ninguna valoración aún.</p>
+        <p>Este usuario no ha recibido ninguna valoración aún.</p>
     @else
         <div class="contenedor-tabla">
             <table class="tabla">
@@ -32,7 +32,8 @@
                         <th>Escrita por</th>
                         <th>Comentario</th>
                         <th>Puntuación</th>
-                        @if (auth()->check() && auth()->user()->esAdmin())
+                        {{-- Cambio: Admin y Empleado ven la columna --}}
+                        @if (auth()->check() && (auth()->user()->esAdmin() || auth()->user()->esEmpleado()))
                             <th>Eliminar valoración</th>
                         @endif
                     </tr>
@@ -68,7 +69,8 @@
                                     @endfor
                                 </div>
                             </td>
-                            @if (auth()->check() && auth()->user()->esAdmin())
+                            {{-- Cambio: Admin y Empleado ven el botón de borrar --}}
+                            @if (auth()->check() && (auth()->user()->esAdmin() || auth()->user()->esEmpleado()))
                                 <td>
                                     <form action="{{ route('borrarvaloracion', ['valoracion' => $valoracion->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta valoración?');">
                                         @csrf
@@ -93,7 +95,7 @@
     </section>
 
     @if ($valoraciones->where('evaluador_id', $user->id)->isEmpty())
-        <p>Este usuario no ha recibido ni ninguna valoración aún.</p>
+        <p>Este usuario no ha realizado ninguna valoración aún.</p>
     @else
 
         <div class="contenedor-tabla">
@@ -103,7 +105,8 @@
                         <th>Usuario valorado</th>
                         <th>Comentario</th>
                         <th>Puntuación</th>
-                        @if (auth()->check() && auth()->user()->esAdmin())
+                        {{-- Cambio: Admin y Empleado ven la columna --}}
+                        @if (auth()->check() && (auth()->user()->esAdmin() || auth()->user()->esEmpleado()))
                             <th>Eliminar valoración</th>
                         @endif
                     </tr>
@@ -121,7 +124,7 @@
                                 @if ($valoracion->comentario)
                                     {{ $valoracion->comentario }}
                                 @else
-                                    <p class="sin-sin-comentario">Valoración sin comentario</p>
+                                    <p class="sin-comentario">Valoración sin comentario</p>
                                 @endif
                             </td>
                             <td>
@@ -139,7 +142,8 @@
                                     @endfor
                                 </div>
                             </td>
-                            @if (auth()->check() && auth()->user()->esAdmin())
+                            {{-- Cambio: Admin y Empleado ven el botón de borrar --}}
+                            @if (auth()->check() && (auth()->user()->esAdmin() || auth()->user()->esEmpleado()))
                                 <td>
                                     <form action="{{ route('borrarvaloracion', ['valoracion' => $valoracion->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta valoración?');">
                                         @csrf
@@ -156,8 +160,11 @@
             </table>
         </div>
     @endif
+    
     <div class="botones-valoraciones">
         <a href="{{ url()->previous() }}" class="enlace-boton">Volver</a>
+        
+        {{-- MANTENEMOS INTACTO ESTO: Solo el Admin ve el botón de Borrar Usuario --}}
         @if (auth()->check() && auth()->user()->esAdmin())
             <form action="{{ route('borrarusuario', ['usuario' => $user->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario de forma permanente?');">
                 @csrf

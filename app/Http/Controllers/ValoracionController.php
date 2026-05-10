@@ -82,8 +82,8 @@ class ValoracionController extends Controller
 
     public function borrarValoracion(Request $request, Valoracion $valoracion) {
         
-        // VALIDACIÓN DE USUARIO (Solo Administrador)
-        if ($request->user()->esAdmin()) {
+        // VALIDACIÓN DE USUARIO (Solo Administrador y empleados)
+        if ($request->user()->esAdmin() && $request->user()->esEmpleado()) {
             
             // Se recupera el intercambio al que pertenece esta valoración
             $intercambio = $valoracion->intercambio; 
@@ -104,7 +104,7 @@ class ValoracionController extends Controller
             
         } else {
             
-            $resultado = back()->with('error', 'Acción denegada. Solo los administradores pueden eliminar valoraciones.');
+            $resultado = back()->with('error', 'Acción denegada. Solo los administradores y empleados pueden eliminar valoraciones.');
         }
 
         // DEVOLUCIÓN DE LA VISTA

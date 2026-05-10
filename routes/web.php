@@ -75,8 +75,13 @@ Route::post('/intercambios/{intercambio}/valorar', [ValoracionController::class,
 // Acción de eliminar una valoración (solo para administradores)
 Route::delete('/valoraciones/{valoracion}', [ValoracionController::class, 'borrarValoracion'])->middleware('auth')->name('borrarvaloracion');
 
+// Ruta hacia gestionar usuarios
+Route::get('/gestionarusuarios', [ProfileController::class, 'irAGestionUsuarios'])->middleware('auth')->name('gestionarusuarios');
 //Acción de eliminar usuario
 Route::delete('/usuarios/{usuario}/borrar', [ProfileController::class, 'borrarUsuario'])->name('borrarusuario');
+
+// Ruta para activar/desactivar usuarios (Moderación)
+Route::patch('/usuarios/{usuario}/toggle-activo', [ProfileController::class, 'toggleActivo'])->name('usuarios.toggleActivo')->middleware('auth');
 
 //Autenticación de usuarios
 Route::get('/dashboard', function () {

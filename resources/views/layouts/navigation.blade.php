@@ -15,24 +15,33 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @auth
                         <x-nav-link :href="route('misprendas')" :active="request()->routeIs('dashboard')">
-                            {{ auth()->user()->rol === 'admin' ? __('Prendas Subidas') : __('Mis prendas') }}
+                            {{ (auth()->user()->rol === 'admin' || auth()->user()->rol === 'empleado') ? __('Gestionar prendas') : __('Mis prendas') }}
                         </x-nav-link>
                     @endauth
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @auth
-                        <x-nav-link :href="route('intercambios')" :active="request()->routeIs('dashboard')">
-                            {{ __('Intercambios') }}
-                        </x-nav-link>
-                    @endauth
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @auth
-                        <x-nav-link :href="route('formsubirprenda')" :active="request()->routeIs('dashboard')">
-                            {{ __('Subir') }}
-                        </x-nav-link>
-                    @endauth
-                </div>
+
+                @auth
+                    @if(auth()->user()->rol === 'usuario')
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('intercambios')" :active="request()->routeIs('dashboard')">
+                                {{ __('Intercambios') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('formsubirprenda')" :active="request()->routeIs('dashboard')">
+                                {{ __('Subir') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
+
+                    @if(auth()->user()->rol === 'admin' || auth()->user()->rol === 'empleado')
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('gestionarusuarios')" :active="request()->routeIs('dashboard')">
+                                {{ __('Gestionar usuarios') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
+                @endauth
             </div>
 
             <!-- Settings Dropdown -->
@@ -95,19 +104,30 @@
         @auth
             <div class="pt-2 pb-3 space-y-1">
                 <x-responsive-nav-link :href="route('misprendas')" :active="request()->routeIs('dashboard')">
-                    {{ auth()->user()->rol === 'admin' ? __('Prendas Subidas') : __('Mis prendas') }}
+                    {{ (auth()->user()->rol === 'admin' || auth()->user()->rol === 'empleado') ? __('Gestionar prendas') : __('Mis prendas') }}
                 </x-responsive-nav-link>
             </div>
-            <div class="pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('intercambios')" :active="request()->routeIs('dashboard')">
-                    {{ __('Intercambios') }}
-                </x-responsive-nav-link>
-            </div>
-            <div class="pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('formsubirprenda')" :active="request()->routeIs('dashboard')">
-                    {{ __('Subir') }}
-                </x-responsive-nav-link>
-            </div>
+
+            @if(auth()->user()->rol === 'usuario')
+                <div class="pt-2 pb-3 space-y-1">
+                    <x-responsive-nav-link :href="route('intercambios')" :active="request()->routeIs('dashboard')">
+                        {{ __('Mis intercambios') }}
+                    </x-responsive-nav-link>
+                </div>
+                <div class="pt-2 pb-3 space-y-1">
+                    <x-responsive-nav-link :href="route('formsubirprenda')" :active="request()->routeIs('dashboard')">
+                        {{ __('Subir') }}
+                    </x-responsive-nav-link>
+                </div>
+            @endif
+
+            @if(auth()->user()->rol === 'admin' || auth()->user()->rol === 'empleado')
+                <div class="pt-2 pb-3 space-y-1">
+                    <x-responsive-nav-link :href="route('gestionarusuarios')" :active="request()->routeIs('dashboard')">
+                        {{ __('Gestionar usuarios') }}
+                    </x-responsive-nav-link>
+                </div>
+            @endif
         @endauth
 
         <!-- Responsive Settings Options -->

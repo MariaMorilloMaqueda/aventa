@@ -43,6 +43,17 @@ class DatosSeeder extends Seeder
             $uAdmin2->save();
         }
 
+        //Empleado
+        if (User::where('email', 'empleado@aventa.com')->count() == 0) {
+            $uEmpleado = new User;
+            $uEmpleado->name = 'Empleado Aventa';
+            $uEmpleado->email = 'empleado@aventa.com';
+            $uEmpleado->password = bcrypt('empleado');
+            $uEmpleado->rol = 'empleado'; // Le asignamos el nuevo rol
+            $uEmpleado->email_verified_at = now();
+            $uEmpleado->save();
+        }
+
         // Usuario 3
         if (User::where('email', 'sergio.moda@mail.com')->count() == 0) {
             $uSergio = new User;
@@ -302,6 +313,7 @@ class DatosSeeder extends Seeder
             $uPepe->email = 'pepe.fonmojada@mail.com';
             $uPepe->password = bcrypt('pepefonmojada');
             $uPepe->rol = 'usuario';
+            $uPepe->activo = false;
             $uPepe->email_verified_at = now();
             $uPepe->save();
         }
