@@ -6,7 +6,6 @@ use App\Http\Controllers\IAController;
 use App\Http\Controllers\IntercambioController;
 use App\Http\Controllers\ValoracionController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
@@ -88,44 +87,22 @@ Route::patch('/usuarios/{usuario}/toggle-activo', [ProfileController::class, 'to
 
 // Ruta para MOSTRAR la vista de mantenimiento (Solo Admin)
 Route::get('/admin/mantenimiento', function (Request $request) {
-    
     $usuario = $request->user();
     $resultado = null;
 
     if ($usuario && $usuario->esAdmin()) {
-        // Buscamos TODOS los archivos en storage/app de forma recursiva
-        $archivos = Storage::disk('local')->allFiles(); 
-        $backups = [];
-
-        foreach ($archivos as $archivo) {
-            // Filtramos solo los archivos .zip
-            if (pathinfo($archivo, PATHINFO_EXTENSION) === 'zip') {
-                $backups[] = [
-                    'timestamp' => Storage::disk('local')->lastModified($archivo),
-                    'fecha' => date('d/m/Y H:i:s', Storage::disk('local')->lastModified($archivo)),
-                ];
-            }
-        }
-
-        // Ordenamos por fecha (el más reciente arriba)
-        usort($backups, function($a, $b) {
-            return $b['timestamp'] <=> $a['timestamp'];
-        });
-
-        $resultado = view('privada.mantenimiento', ['backups' => $backups]);
+        $resultado = view('privada.mantenimiento');
     } else {
         $resultado = redirect()->route('catalogo')->with('error', 'No tienes permisos para acceder a esta área.');
     }
 
-    // ÚNICO RETURN DE LA FUNCIÓN
+    // ÚNICO RETURN
     return $resultado;
-
 })->name('mantenimiento');
 
 
 // Ruta para EJECUTAR la copia de seguridad
 Route::get('/admin/generar-backup-manual', function (Request $request) {
-    
     $usuario = $request->user();
     $resultado = null;
 
@@ -139,9 +116,9 @@ Route::get('/admin/generar-backup-manual', function (Request $request) {
     } else {
         $resultado = redirect()->route('catalogo')->with('error', 'No tienes permisos para realizar esta acción.');
     }
-    // DEVOLUCIÓN DE LA VISTA / REDIRECCIÓN
-    return $resultado;
     
+    // ÚNICO RETURN
+    return $resultado;
 })->name('ejecutar.backup');
 
 //Autenticación de usuarios

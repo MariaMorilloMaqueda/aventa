@@ -26,35 +26,4 @@
         </header>
     </section>
 
-    <section class="seccion-comun">
-        <header class="cabecera-comun">
-            <h2>Historial de copias de seguridad</h2>
-        </header>
-    </section>
-
-    <div class="contenedor-tabla">
-        <table class="tabla">
-            <thead>
-                <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($backups as $backup)
-                    <tr>
-                        <td>{{ $backup['fecha'] }}</td>
-                        <td style="color: #28a745; font-weight: bold;"> Completado con éxito</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="2" style="text-align: center; font-style: italic; color: gray;">
-                            No se han realizado copias de seguridad todavía.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
 @endsection
