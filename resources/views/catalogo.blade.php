@@ -92,7 +92,7 @@
                         </div>
                     </div>
 
-                    @if (!auth()->check() || !auth()->user()->esAdmin())
+                    @if (!auth()->check() || (!auth()->user()->esAdmin() && !auth()->user()->esEmpleado()))
                         <div class="tarjeta-acciones tarjeta-acciones-intercambio">
                             @guest
                                 <form action="{{ route('register') }}" method="get" class="w-100">

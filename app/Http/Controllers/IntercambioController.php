@@ -12,64 +12,80 @@ class IntercambioController extends Controller {
     public function irAIntercambios(Request $request) {
 
         $usuario = $request->user();
+        $resultado = null;
         
         // BLOQUEO DE SEGURIDAD: Solo usuarios estándar pueden acceder
         if ($usuario->rol !== 'usuario') {
-            return redirect()->route('catalogo')->with('error', 'No tienes permisos para acceder a esta sección.');
-        }
+            $resultado = redirect()->route('catalogo')->with('error', 'El personal no tiene acceso al área de intercambios.');
+        } else {
+            // USUARIO NORMAL: ve sus propios intercambios
+            $userId = $usuario->id;
 
-        // USUARIO NORMAL: ve sus propios intercambios
-        $userId = $usuario->id;
-
-        $intercambios = Intercambio::with([
-            'solicitante', 
-            'receptor', 
-            'prendaOfrecida.imagenes', 
-            'prendaSolicitada.imagenes'
-        ])
-        ->where('solicitante_id', $userId)
-        ->orWhere('receptor_id', $userId)
-        ->get();
-
-        $idsIntercambios = $intercambios->pluck('id');
-
-        $valoraciones = Valoracion::with(['intercambio.solicitante', 'intercambio.receptor'])
-            ->whereIn('intercambio_id', $idsIntercambios)
+            $intercambios = Intercambio::with([
+                'solicitante', 
+                'receptor', 
+                'prendaOfrecida.imagenes', 
+                'prendaSolicitada.imagenes'
+            ])
+            ->where('solicitante_id', $userId)
+            ->orWhere('receptor_id', $userId)
             ->get();
 
-        $titulo = "este es tu historial de intercambios";
+            $idsIntercambios = $intercambios->pluck('id');
 
-        // GENERACIÓN DE LA VISTA
-        return view('privada.intercambios', ['intercambios' => $intercambios,'valoraciones' => $valoraciones,'mensajePersonalizado' => $titulo]);
+            $valoraciones = Valoracion::with(['intercambio.solicitante', 'intercambio.receptor'])
+                ->whereIn('intercambio_id', $idsIntercambios)
+                ->get();
+
+            $titulo = "este es tu historial de intercambios";
+
+            // GENERACIÓN DE LA VISTA
+            $resultado = view('privada.intercambios', [
+                'intercambios' => $intercambios,
+                'valoraciones' => $valoraciones,
+                'mensajePersonalizado' => $titulo
+            ]);
+        }
+
+        return $resultado;
     }
 
     public function irAIntercambiar(Request $request, Prenda $prenda) {
 
-        // VALIDACIÓN DE USUARIO
-        // Se valida si el usuario registrado es administrador.
-        if ($request->user()->esAdmin()) {
-            $resultado = redirect()->route('catalogo')->with('error', 'Los administradores no participan en intercambios.');
+        $usuario = $request->user();
+        $resultado = null;
+
+        // VALIDACIÓN DE USUARIO (Con ||, si es uno u otro, se bloquea)
+        if ($usuario->esAdmin() || $usuario->esEmpleado()) {
+            $resultado = redirect()->route('catalogo')->with('error', 'El personal no participa en intercambios.');
         }
         // Se valida si el solicitante es el dueño de la prenda.
-        elseif ($prenda->user_id === auth()->id()) {
-        $resultado = redirect()->route('catalogo')->with('error', 'No puedes intercambiar tu propia prenda.');
+        elseif ($prenda->user_id === $usuario->id) {
+            $resultado = redirect()->route('catalogo')->with('error', 'No puedes intercambiar tu propia prenda.');
         } else {
-        // Se buscan aquellas prendas que estén disponibles
-        $misPrendas = Prenda::where('user_id', auth()->id())->get();
-        $resultado = view('privada.iniciarintercambio', ['prendaSolicitada' => $prenda, 'misPrendas' => $misPrendas]);
+            // Se buscan aquellas prendas que estén disponibles
+            $misPrendas = Prenda::where('user_id', $usuario->id)->get();
+            $resultado = view('privada.iniciarintercambio', [
+                'prendaSolicitada' => $prenda, 
+                'misPrendas' => $misPrendas
+            ]);
         }
         
         return $resultado;
     }
 
-    public function iniciarIntercambio (Request $request, Prenda $prenda) {
+    public function iniciarIntercambio(Request $request, Prenda $prenda) {
 
-        // VALIDACIÓN DE USUARIO
+        $usuario = $request->user();
+        $resultado = null;
+
+        // VALIDACIÓN EXTRA: Por seguridad, volvemos a bloquear roles por si acceden directamente por POST
+        if ($usuario->esAdmin() || $usuario->esEmpleado()) {
+            $resultado = redirect()->route('catalogo')->with('error', 'El personal no puede realizar intercambios.');
+        }
         // Se valida si el solicitante es el dueño de la prenda.
-        if ($prenda->user_id === auth()->id()) {
-            
-        $resultado = redirect()->route('catalogo')->with('error', 'No puedes intercambiar tu propia prenda.');
-        
+        elseif ($prenda->user_id === $usuario->id) {
+            $resultado = redirect()->route('catalogo')->with('error', 'No puedes intercambiar tu propia prenda.');
         } else {
 
             // VALIDACIÓN DE DATOS
@@ -83,8 +99,8 @@ class IntercambioController extends Controller {
             // MODIFICACIÓN DEL MODELO --> Eloquent
             if ($datos) {
                 $intercambio = new Intercambio;
-                // En este caso, todas las asignaciones son automátias excepto la prenda ofecida
-                $intercambio->solicitante_id = auth()->id();
+                
+                $intercambio->solicitante_id = $usuario->id;
                 $intercambio->receptor_id = $prenda->user_id;
                 $intercambio->prenda_solicitada_id = $prenda->id;
                 $intercambio->prenda_ofrecida_id = $request->prenda_ofrecida_id;
@@ -96,7 +112,7 @@ class IntercambioController extends Controller {
             $resultado = redirect()->route('intercambios')->with('mensaje', '¡Propuesta de intercambio enviada con éxito!');
         }
 
-        // DEVOLUNCIÓN DE LA VISTA
+        // DEVOLUCIÓN DE LA VISTA O REDIRECCIÓN
         return $resultado;
     }
 
