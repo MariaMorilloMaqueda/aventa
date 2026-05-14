@@ -22,11 +22,9 @@
     @endif
 
     <section class="seccion-comun">
-        <!-- Se hacen comprobaciones tambien en el frontend con HTML5 -->
         <form class="formulario-catalogo formulario-prenda" action="{{ route('actualizarprenda', ['prenda' => $prenda->id]) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <!-- Se añade JavaScript para validar el tamaño de los archivos mediante la clase validar-archivo -->
             <div class="grupo-input">
                 <label for="imagen">Cambiar imagen (Opcional):</label>
                 <input type="file" id="imagen" name="imagen" accept=".jpeg, .png, .jpg, .webp" class="validar-peso">
@@ -34,7 +32,16 @@
 
             <div class="grupo-input">
                 <label for="titulo">Título:</label>
-                <input type="text" id="titulo" name="titulo" value="{{ old('titulo', $prenda->titulo) }}" minlength="4" maxlength="50" required>
+                <input 
+                    type="text" 
+                    id="titulo" 
+                    name="titulo" 
+                    value="{{ old('titulo', $prenda->titulo) }}" 
+                    minlength="4" 
+                    maxlength="50" 
+                    pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+" 
+                    title="Solo se permiten letras, números, espacios y los caracteres . , - /" 
+                    required>
             </div>
 
             <div class="grupo-input col-completa">
@@ -57,7 +64,16 @@
 
             <div class="grupo-input">
                 <label for="deporte">Deporte:</label>
-                <input type="text" id="deporte" name="deporte" value="{{ old('deporte', $prenda->deporte) }}" minlength="4" maxlength="50" required>
+                <input 
+                    type="text" 
+                    id="deporte" 
+                    name="deporte" 
+                    value="{{ old('deporte', $prenda->deporte) }}" 
+                    minlength="4" 
+                    maxlength="50" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
+                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    required>
             </div>
 
             <div class="grupo-input">
@@ -75,12 +91,30 @@
 
             <div class="grupo-input">
                 <label for="equipo">Equipo:</label>
-                <input type="text" id="equipo" name="equipo" value="{{ old('equipo', $prenda->equipo) }}" minlength="4" maxlength="50" required>
+                <input 
+                    type="text" 
+                    id="equipo" 
+                    name="equipo" 
+                    value="{{ old('equipo', $prenda->equipo) }}" 
+                    minlength="4" 
+                    maxlength="50" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
+                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    required>
             </div>
 
             <div class="grupo-input">
                 <label for="color">Color:</label>
-                <input type="text" id="color" name="color" value="{{ old('color', $prenda->color) }}" minlength="4" maxlength="50" required>
+                <input 
+                    type="text" 
+                    id="color" 
+                    name="color" 
+                    value="{{ old('color', $prenda->color) }}" 
+                    minlength="4" 
+                    maxlength="50" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
+                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    required>
             </div>
 
             <div class="grupo-input">

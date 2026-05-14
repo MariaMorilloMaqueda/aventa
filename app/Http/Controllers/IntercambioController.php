@@ -139,7 +139,6 @@ class IntercambioController extends Controller {
         return  $resultado;
     }
 
-
     public function cancelarIntercambio(Request $request, Intercambio $intercambio) {
 
         // VALIDACIÓN DE USUARIO Y ESTADO

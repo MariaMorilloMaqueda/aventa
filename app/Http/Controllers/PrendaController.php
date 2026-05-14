@@ -241,9 +241,22 @@ class PrendaController extends Controller
                 'estado' => 'required|in:Nuevo,Seminuevo,Usado',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
             ], [
-                // (Tus mensajes de error se quedan iguales)
+                // Mensajes estándar
                 'titulo.required' => 'El título de la prenda es obligatorio.',
-                // ... he omitido la lista larga aquí para no hacerte spam visual, pero déjalos como los tienes en tu código original
+                'descripcion.required' => 'La descripción es obligatoria.',
+                'tipo.required' => 'El tipo de prenda es obligatorio.',
+                'deporte.required' => 'El deporte es obligatorio.',
+                'talla.required' => 'La talla es obligatoria.',
+                'equipo.required' => 'El equipo es obligatorio.',
+                'color.required' => 'El color es obligatorio.',
+                'estado.required' => 'El estado es obligatorio.',
+                
+                // MENSAJES PARA LAS EXPRESIONES REGULARES (REGEX)
+                'titulo.regex' => 'El título contiene caracteres no permitidos (solo letras, números y .,-/)',
+                'descripcion.regex' => 'La descripción contiene caracteres no permitidos (solo letras, números y .,-/)',
+                'deporte.regex' => 'El deporte solo puede contener letras y guiones (sin números)',
+                'equipo.regex' => 'El equipo solo puede contener letras y guiones (sin números)',
+                'color.regex' => 'El color solo puede contener letras y guiones (sin números)',
             ]);
 
             // MODIFICACIÓN DEL MODELO --> Eloquent
