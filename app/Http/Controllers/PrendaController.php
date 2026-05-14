@@ -79,16 +79,13 @@ class PrendaController extends Controller
         $datos = $request->validate(
             [
                 // Permite letras, números, espacios, puntos, comas, guiones y barras. Prohíbe símbolos raros (@, #, €, etc)
-                'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 'descripcion' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
-                
                 'tipo' => 'required|in:Camiseta,Calzonas,Pantalón,Sudadera,Chándal,Bufanda,Otro',
-                
-                // Estrictos: Solo letras, espacios y guiones (sin números)
-                'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 'talla' => 'required|in:XS,S,M,L,XL,XXL,Única',
-                'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
-                'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+                'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 
                 'anio' => 'nullable|integer|min:1900|max:' . date('Y'),
                 'etiquetas' => 'nullable|string|max:255',
@@ -229,13 +226,13 @@ class PrendaController extends Controller
 
             // VALIDACIÓN DE DATOS (Se queda exactamente igual que lo tenías)
             $datos = $request->validate([
-                'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
+                'titulo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 'descripcion' => ['required', 'string', 'max:250', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+$/'],
                 'tipo' => 'required|in:Camiseta,Calzonas,Pantalón,Sudadera,Chándal,Bufanda,Otro',
-                'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                'deporte' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 'talla' => 'required|in:XS,S,M,L,XL,XXL,Única',
-                'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
-                'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/'],
+                'equipo' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+                'color' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
                 'anio' => 'nullable|integer|min:1900|max:' . date('Y'),
                 'etiquetas' => 'nullable|string|max:255',
                 'estado' => 'required|in:Nuevo,Seminuevo,Usado',

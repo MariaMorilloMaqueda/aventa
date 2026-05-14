@@ -39,8 +39,8 @@
                     name="titulo" 
                     minlength="4" 
                     maxlength="50" 
-                    pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\.,\-\/]+" 
-                    title="Solo se permiten letras, números, espacios y los caracteres . , - /" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                    title="Solo se permiten letras y espacios"
                     required>
             </div>
 
@@ -71,8 +71,8 @@
                     name="deporte" 
                     minlength="4" 
                     maxlength="50" 
-                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
-                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                    title="Solo se permiten letras y espacios"
                     required>
             </div>
 
@@ -98,8 +98,8 @@
                     name="equipo" 
                     minlength="4" 
                     maxlength="50" 
-                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
-                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                    title="Solo se permiten letras y espacios" 
                     required>
             </div>
 
@@ -111,8 +111,8 @@
                     name="color" 
                     minlength="4" 
                     maxlength="50" 
-                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+" 
-                    title="Solo se permiten letras, espacios y guiones (sin números)" 
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" 
+                    title="Solo se permiten letras y espacios" 
                     required>
             </div>
 
