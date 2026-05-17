@@ -104,7 +104,7 @@ class ProfileController extends Controller
             $usuario->delete();
             
             // Redirigimos de nuevo a la tabla para que vea que ha desaparecido
-            $resultado = redirect()->route('privada.gestionarusuarios')->with('mensaje', 'El usuario ' . $nombreBorrado . ' ha sido eliminado del sistema.');
+            $resultado = redirect()->route('gestionarusuarios')->with('mensaje', 'El usuario ' . $nombreBorrado . ' ha sido eliminado del sistema.');
         }
 
         return $resultado;
